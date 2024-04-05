@@ -1,0 +1,41 @@
+- name: Install ZSH
+  apt: name=zsh
+
+- name: Install Oh My Zsh
+  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+- name: Change default shell to zsh
+  shell: chsh -s $(which zsh)
+
+- name: Install zsh-autosuggestions
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+
+- name: Install zsh-syntax-highlighting
+  git:  
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git 
+    dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+
+- name: Install fzf
+  apt: name=fzf
+
+- name: Install fzf-zsh-plugin
+  git:
+    repo: https://github.com/unixorn/fzf-zsh-plugin.git
+    dest: ~/.oh-my-zsh/custom/plugins/fzf-zsh-plugin  
+
+- name: Set fzf plugin
+  become: true
+  shell: | 
+    echo "source ~/.oh-my-zsh/custom/plugins/fzf-zsh-plugin/fzf-zsh-plugin.plugin.zsh" >> ~/.zshrc
+
+- name: Set zsh plugins
+  become: true
+  shell: | 
+    sed -i 's/plugins=(git)/plugins=(git z zsh-autosuggestions zsh-syntax-highlighting fzf)/' ~/.zshrc
+
+- name: Set zsh theme
+  become: true
+  shell: | 
+    sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="blinks"/' ~/.zshrc

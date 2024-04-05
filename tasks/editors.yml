@@ -1,0 +1,4 @@
+- name: Install NeoVim
+  apt: name=neovim
+  tags: 
+  - editor
