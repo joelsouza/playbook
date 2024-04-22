@@ -1,26 +1,25 @@
 # My Ansible Playbook
 
-I use this playbook to install necessary packages and configure my servers. It's designed to work with Debian and Ubuntu servers.
+I use this playbook to install necessary packages and configure my servers. It's designed to work with Debian and Ubuntu instances.
 
 Pacakges installed:
 
-- zsh and oh-my-zsh
-- neovim
-- asdf
+- [zsh](https://www.zsh.org/) and [oh-my-zsh](https://ohmyz.sh/)
+- [Neovim](https://neovim.io/) and [NvChad](https://nvchad.com/)
+- [asdf](https://asdf-vm.com/)
+- [Lazygit](https://github.com/jesseduffield/lazygit)
 
 ## Usage
 
 ```bash
-$ ansible-playbook playbook.yml 
-# run the playbook
+ansible-playbook playbook.yml
 ```
 
-## Test it with a Docker Container
+## Trying it in a Docker Container
 
 ```bash
-$ ./build.sh 
-# build docker image and run container
-
-$ ./playbook.sh
+# build and run the container
+./build  
 # run the playbook
+./playbook
 ```
