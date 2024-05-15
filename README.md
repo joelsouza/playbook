@@ -5,6 +5,7 @@ I use this playbook to install necessary packages and configure my servers. It's
 Pacakges installed:
 
 - [zsh](https://www.zsh.org/) and [oh-my-zsh](https://ohmyz.sh/)
+- [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) and [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)
 - [Neovim](https://neovim.io/) and [NvChad](https://nvchad.com/)
 - [asdf](https://asdf-vm.com/)
 - [Lazygit](https://github.com/jesseduffield/lazygit)
