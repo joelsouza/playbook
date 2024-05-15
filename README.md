@@ -8,6 +8,8 @@ Pacakges installed:
 - [Neovim](https://neovim.io/) and [NvChad](https://nvchad.com/)
 - [asdf](https://asdf-vm.com/)
 - [Lazygit](https://github.com/jesseduffield/lazygit)
+- [tldr](https://github.com/tldr-pages/tlrc)
+- [fzf](https://github.com/junegunn/fzf)
 
 ## Usage
 
@@ -19,7 +21,7 @@ ansible-playbook playbook.yml
 
 ```bash
 # build and run the container
-./build  
+./build
 # run the playbook
 ./playbook
 ```
