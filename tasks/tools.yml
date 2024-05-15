@@ -5,3 +5,5 @@
     tar xf lazygit.tar.gz -C /usr/local/bin/ lazygit
 - name: Install fzf
   apt: name=fzf
+- name: Install tl;dr
+  apt: name=tldr
