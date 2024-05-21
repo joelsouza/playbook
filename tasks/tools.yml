@@ -7,3 +7,7 @@
   apt: name=fzf
 - name: Install tl;dr
   apt: name=tldr
+- name: Install bat
+  apt: name=bat
+- name: Install ripgrep
+  apt: name=ripgrep
