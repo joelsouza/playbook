@@ -1,28 +1,60 @@
-- name: Install ZSH
-  apt: name=zsh
+---
+- name: Install zsh and git
+  ansible.builtin.apt:
+    name:
+      - zsh
+      - git
+      - curl
+    state: present
+  become: true
 
 - name: Install Oh My Zsh
-  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  ansible.builtin.git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ target_home }}/.oh-my-zsh"
+    depth: 1
+    update: false
 
-- name: Change default shell to zsh
-  shell: chsh -s $(which zsh)
+- name: Create .zshrc from the Oh My Zsh template
+  ansible.builtin.copy:
+    src: "{{ target_home }}/.oh-my-zsh/templates/zshrc.zsh-template"
+    dest: "{{ target_home }}/.zshrc"
+    remote_src: true
+    force: false
+    mode: "0644"
 
 - name: Install zsh-autosuggestions
-  git:
-    repo: https://github.com/zsh-users/zsh-autosuggestions
-    dest: "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions.git
+    dest: "{{ target_home }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+    depth: 1
 
 - name: Install zsh-syntax-highlighting
-  git:  
-    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git 
-    dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: "{{ target_home }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    depth: 1
 
 - name: Set zsh plugins
-  become: true
-  shell: | 
-    sed -i 's/plugins=(git)/plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.zshrc"
+    regexp: '^plugins=\('
+    line: plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)
 
 - name: Set zsh theme
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.zshrc"
+    regexp: '^ZSH_THEME='
+    line: ZSH_THEME="blinks"
+
+- name: Add ~/.local/bin to PATH
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.zshrc"
+    line: export PATH="$HOME/.local/bin:$PATH"
+    insertafter: EOF
+
+- name: Change default shell to zsh
+  ansible.builtin.user:
+    name: "{{ target_user }}"
+    shell: /usr/bin/zsh
   become: true
-  shell: | 
-    sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="blinks"/' ~/.zshrc

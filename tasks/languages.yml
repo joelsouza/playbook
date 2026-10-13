@@ -1,7 +1,28 @@
-- name: Install asdf 
-  git:
-    repo: https://github.com/asdf-vm/asdf.git 
-    dest: ~/.asdf
-    version: v0.14.0 
+---
+# asdf >= 0.16 is a single Go binary. Shims live in $ASDF_DATA_DIR/shims.
+- name: Create ~/.local/bin
+  ansible.builtin.file:
+    path: "{{ target_home }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Check the installed asdf version
+  ansible.builtin.command: "{{ target_home }}/.local/bin/asdf --version"
+  register: asdf_installed
+  changed_when: false
+  failed_when: false
+
+- name: Install asdf
+  ansible.builtin.unarchive:
+    src: "https://github.com/asdf-vm/asdf/releases/download/{{ asdf_version }}/asdf-{{ asdf_version }}-linux-{{ asdf_arch }}.tar.gz"
+    dest: "{{ target_home }}/.local/bin"
+    remote_src: true
+  when: asdf_version not in asdf_installed.stdout
+
 - name: Add asdf to zshrc
-  shell: echo '. $HOME/.asdf/asdf.sh' >> ~/.zshrc
+  ansible.builtin.blockinfile:
+    path: "{{ target_home }}/.zshrc"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: asdf"
+    block: |
+      export ASDF_DATA_DIR="${ASDF_DATA_DIR:-$HOME/.asdf}"
+      export PATH="$ASDF_DATA_DIR/shims:$PATH"

@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
-docker build . -t my-instance && \
+# Build the test image and open a shell inside it.
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+docker build -t my-instance .
 docker run --rm -it my-instance bash

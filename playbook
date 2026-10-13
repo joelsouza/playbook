@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
+# Run the playbook. Extra arguments go to ansible-playbook (e.g. --tags tools).
+set -euo pipefail
 
-ansible-playbook playbook.yml
+cd "$(dirname "$0")"
+
+exec ansible-playbook playbook.yml "$@"

@@ -1,11 +1,55 @@
-- hosts: localhost
-  become: true
+---
+- name: Configure workstation
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    # Pinned versions. Change here to upgrade.
+    asdf_version: v0.20.2
+    lazygit_version: 0.66.1
+    neovim_version: v0.12.6
+
+    # Map ansible_architecture to the names used by each upstream release.
+    asdf_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_architecture] }}"
+    lazygit_arch: "{{ {'x86_64': 'x86_64', 'aarch64': 'arm64'}[ansible_architecture] }}"
+    neovim_arch: "{{ {'x86_64': 'x86_64', 'aarch64': 'arm64'}[ansible_architecture] }}"
+    dpkg_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_architecture] }}"
+
+    # User-level files go to the login user, never to root.
+    target_user: "{{ ansible_user_id }}"
+    target_home: "{{ ansible_env.HOME }}"
+
   pre_tasks:
+    - name: Check the target is a supported OS
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == 'Debian'
+          - ansible_distribution in ['Ubuntu', 'Debian']
+          - ansible_architecture in ['x86_64', 'aarch64']
+        fail_msg: This playbook supports Debian and Ubuntu on x86_64 or aarch64 only.
+      tags: always
+
     - name: Update apt cache
-      apt: 
-        update_cache: yes 
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+      tags: always
+
   tasks:
-    - include_tasks: tasks/zsh.yml
-    - include_tasks: tasks/languages.yml
-    - include_tasks: tasks/tools.yml
-    - include_tasks: tasks/editors.yml
+    - name: Zsh
+      ansible.builtin.import_tasks: tasks/zsh.yml
+      tags: zsh
+
+    - name: Languages
+      ansible.builtin.import_tasks: tasks/languages.yml
+      tags: languages
+
+    - name: Tools
+      ansible.builtin.import_tasks: tasks/tools.yml
+      tags: tools
+
+    - name: Editors
+      ansible.builtin.import_tasks: tasks/editors.yml
+      tags: editors

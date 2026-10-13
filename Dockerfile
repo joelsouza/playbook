@@ -1,20 +1,19 @@
-FROM ubuntu:focal
-
-ARG TAGS
-
-WORKDIR /usr/local/bin
+FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG USERNAME=dev
 
 RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y software-properties-common curl git build-essential && \
-    apt-add-repository -y ppa:ansible/ansible && \
-    apt-get update && \
-    apt-get install -y curl git ansible build-essential && \
-    apt-get clean autoclean && \
-    apt-get autoremove --yes
+    apt-get install -y --no-install-recommends ansible ca-certificates curl git sudo && \
+    rm -rf /var/lib/apt/lists/* && \
+    (userdel -r ubuntu 2>/dev/null || true) && \
+    useradd --create-home --shell /bin/bash --groups sudo "${USERNAME}" && \
+    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" && \
+    chmod 0440 "/etc/sudoers.d/${USERNAME}"
 
-COPY . .
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}/playbook
 
-CMD ["sh", "-c", "ansible-playbook $TAGS local.yml"]
+COPY --chown=${USERNAME}:${USERNAME} . .
+
+CMD ["bash"]

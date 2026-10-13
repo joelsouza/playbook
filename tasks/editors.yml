@@ -1,4 +1,18 @@
-- name: Install NeoVim
-  apt: name=neovim
-  tags: 
-  - editor
+---
+# The distro package is often several releases behind, so use the upstream tarball.
+- name: Install Neovim
+  ansible.builtin.unarchive:
+    src: "https://github.com/neovim/neovim/releases/download/{{ neovim_version }}/nvim-linux-{{ neovim_arch }}.tar.gz"
+    dest: /opt
+    remote_src: true
+    creates: "/opt/nvim-linux-{{ neovim_arch }}-{{ neovim_version }}"
+    extra_opts:
+      - --transform=s,^nvim-linux-{{ neovim_arch }},nvim-linux-{{ neovim_arch }}-{{ neovim_version }},
+  become: true
+
+- name: Link nvim into PATH
+  ansible.builtin.file:
+    src: "/opt/nvim-linux-{{ neovim_arch }}-{{ neovim_version }}/bin/nvim"
+    dest: /usr/local/bin/nvim
+    state: link
+  become: true
