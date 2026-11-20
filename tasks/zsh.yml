@@ -7,6 +7,7 @@
       - curl
     state: present
   become: true
+  when: is_linux
 
 - name: Install Oh My Zsh
   ansible.builtin.git:
@@ -56,5 +57,6 @@
 - name: Change default shell to zsh
   ansible.builtin.user:
     name: "{{ target_user }}"
-    shell: /usr/bin/zsh
+    shell: "{{ zsh_path }}"
   become: true
+  when: ansible_user_shell != zsh_path

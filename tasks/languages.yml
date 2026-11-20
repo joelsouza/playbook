@@ -11,13 +11,23 @@
   register: asdf_installed
   changed_when: false
   failed_when: false
+  check_mode: false
+  when: is_linux
 
 - name: Install asdf
   ansible.builtin.unarchive:
     src: "https://github.com/asdf-vm/asdf/releases/download/{{ asdf_version }}/asdf-{{ asdf_version }}-linux-{{ asdf_arch }}.tar.gz"
     dest: "{{ target_home }}/.local/bin"
     remote_src: true
-  when: asdf_version not in asdf_installed.stdout
+  when:
+    - is_linux
+    - asdf_version not in asdf_installed.stdout
+
+- name: Install asdf with Homebrew
+  community.general.homebrew:
+    name: asdf
+    state: present
+  when: is_macos
 
 - name: Add asdf to zshrc
   ansible.builtin.blockinfile:

@@ -1,6 +1,6 @@
 # My Ansible Playbook
 
-I use this playbook to install necessary packages and configure my machines. It works with Debian and Ubuntu on x86_64 and aarch64.
+I use this playbook to install necessary packages and configure my machines. It works with macOS (Intel and Apple Silicon) and with Debian and Ubuntu on x86_64 and aarch64. On macOS, tools come from Homebrew.
 
 Packages installed:
 
@@ -9,18 +9,19 @@ Packages installed:
 - [Neovim](https://neovim.io/) from the upstream release
 - [asdf](https://asdf-vm.com/) The Multiple Runtime Version Manager
 - [Lazygit](https://github.com/jesseduffield/lazygit) Simple terminal UI for git commands
-- [tldr](https://tldr.sh/) Simplified man pages
+- [tldr](https://tldr.sh/) Simplified man pages (`tlrc` on macOS)
 - [fzf](https://github.com/junegunn/fzf) A command-line fuzzy finder
 - [bat](https://github.com/sharkdp/bat) A cat(1) clone with wings
 - [ripgrep](https://github.com/BurntSushi/ripgrep) Recursively searches directories for a regex pattern
 - [htop](https://htop.dev/) Interactive process viewer
-- [Docker Engine](https://docs.docker.com/engine/) from the official Docker apt repository
+- [Docker Engine](https://docs.docker.com/engine/) from the official Docker apt repository (Docker Desktop on macOS)
 - [magic-wormhole](https://github.com/magic-wormhole/magic-wormhole) Send files between computers
 
 ## Requirements
 
 - Ansible 2.14 or newer
 - A user with `sudo` access
+- On macOS: [Homebrew](https://brew.sh/)
 
 ## Usage
 
@@ -37,7 +38,7 @@ Run only some parts with tags: `zsh`, `languages`, `tools`, `docker`, `editors`.
 
 The playbook is idempotent. Run it again at any time.
 
-To upgrade asdf, Lazygit or Neovim, change the version variable in `playbook.yml`.
+On Linux, to upgrade asdf, Lazygit or Neovim, change the version variable in `playbook.yml`. On macOS, use `brew upgrade`.
 
 ## Trying it in a Docker Container
 

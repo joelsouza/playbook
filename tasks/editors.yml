@@ -9,6 +9,7 @@
     extra_opts:
       - --transform=s,^nvim-linux-{{ neovim_arch }},nvim-linux-{{ neovim_arch }}-{{ neovim_version }},
   become: true
+  when: is_linux
 
 - name: Link nvim into PATH
   ansible.builtin.file:
@@ -16,3 +17,10 @@
     dest: /usr/local/bin/nvim
     state: link
   become: true
+  when: is_linux
+
+- name: Install Neovim with Homebrew
+  community.general.homebrew:
+    name: neovim
+    state: present
+  when: is_macos

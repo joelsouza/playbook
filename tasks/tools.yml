@@ -10,6 +10,21 @@
       - magic-wormhole
     state: present
   become: true
+  when: is_linux
+
+# Homebrew has no "tldr" formula; tlrc is the official client and provides the tldr command.
+- name: Install CLI tools from Homebrew
+  community.general.homebrew:
+    name:
+      - fzf
+      - tlrc
+      - bat
+      - ripgrep
+      - htop
+      - magic-wormhole
+      - lazygit
+    state: present
+  when: is_macos
 
 # Debian and Ubuntu ship bat as "batcat" to avoid a name clash.
 - name: Link bat to batcat
@@ -18,13 +33,15 @@
     dest: "{{ target_home }}/.local/bin/bat"
     state: link
   failed_when: false
-  when: ansible_distribution in ['Ubuntu', 'Debian']
+  when: is_linux
 
 - name: Check the installed LazyGit version
   ansible.builtin.command: /usr/local/bin/lazygit --version
   register: lazygit_installed
   changed_when: false
   failed_when: false
+  check_mode: false
+  when: is_linux
 
 - name: Install LazyGit
   ansible.builtin.unarchive:
@@ -33,7 +50,9 @@
     include: lazygit
     remote_src: true
   become: true
-  when: "'version=' + lazygit_version not in lazygit_installed.stdout"
+  when:
+    - is_linux
+    - "'version=' + lazygit_version not in lazygit_installed.stdout"
 
 - name: Install Docker prerequisites
   ansible.builtin.apt:
@@ -42,6 +61,7 @@
       - curl
     state: present
   become: true
+  when: is_linux
   tags: docker
 
 - name: Create the apt keyrings directory
@@ -50,6 +70,7 @@
     state: directory
     mode: "0755"
   become: true
+  when: is_linux
   tags: docker
 
 - name: Add the Docker apt signing key
@@ -58,6 +79,7 @@
     dest: /etc/apt/keyrings/docker.asc
     mode: "0644"
   become: true
+  when: is_linux
   tags: docker
 
 - name: Add the Docker apt repository
@@ -69,6 +91,7 @@
     filename: docker
     state: present
   become: true
+  when: is_linux
   tags: docker
 
 - name: Install Docker Engine
@@ -82,6 +105,7 @@
     state: present
     update_cache: true
   become: true
+  when: is_linux
   tags: docker
 
 - name: Allow the user to run Docker without sudo
@@ -90,4 +114,12 @@
     groups: docker
     append: true
   become: true
+  when: is_linux
+  tags: docker
+
+- name: Install Docker Desktop
+  community.general.homebrew_cask:
+    name: docker-desktop
+    state: present
+  when: is_macos
   tags: docker

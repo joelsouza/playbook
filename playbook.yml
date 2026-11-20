@@ -20,14 +20,24 @@
     target_user: "{{ ansible_user_id }}"
     target_home: "{{ ansible_env.HOME }}"
 
+    is_linux: "{{ ansible_os_family == 'Debian' }}"
+    is_macos: "{{ ansible_os_family == 'Darwin' }}"
+    zsh_path: "{{ '/bin/zsh' if is_macos else '/usr/bin/zsh' }}"
+
   pre_tasks:
     - name: Check the target is a supported OS
       ansible.builtin.assert:
-        that:
-          - ansible_os_family == 'Debian'
-          - ansible_distribution in ['Ubuntu', 'Debian']
-          - ansible_architecture in ['x86_64', 'aarch64']
-        fail_msg: This playbook supports Debian and Ubuntu on x86_64 or aarch64 only.
+        that: >-
+          (ansible_distribution in ['Ubuntu', 'Debian'] and ansible_architecture in ['x86_64', 'aarch64'])
+          or ansible_os_family == 'Darwin'
+        fail_msg: This playbook supports macOS, and Debian or Ubuntu on x86_64 or aarch64.
+      tags: always
+
+    - name: Check Homebrew is installed
+      ansible.builtin.command: brew --version
+      changed_when: false
+      check_mode: false
+      when: is_macos
       tags: always
 
     - name: Update apt cache
@@ -35,6 +45,7 @@
         update_cache: true
         cache_valid_time: 3600
       become: true
+      when: is_linux
       tags: always
 
   tasks:
